@@ -4,101 +4,292 @@
     <title>SmartCampus+</title>
     <link rel="stylesheet" href="/static/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        /* Customization Modal CSS */
+        .custom-modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:10000; justify-content:center; align-items:center; }
+        .custom-box { background:#1e293b; padding:25px; border-radius:12px; width:90%; max-width:400px; color:white; }
+        .custom-section { margin-top:15px; background:#0f172a; padding:15px; border-radius:8px; border:1px solid #334155; }
+        .custom-option { display:flex; justify-content:space-between; margin-bottom:10px; align-items:center; }
+        .custom-option input { margin-right:10px; cursor:pointer; }
+    </style>
 </head>
 <body>
 
 <header class="main-header">
     <h2><i class="fa-solid fa-graduation-cap"></i> SmartCampus+</h2>
-    <div>
-        Welcome {{user}}
-        <a href="/logout" class="logout-btn">Logout</a>
-    </div>
+    <div>Welcome {{user}} | <a href="/logout" class="logout-btn">Logout</a></div>
 </header>
 
 <div class="tabs">
-    <button class="tab-btn active" onclick="showTab('food', this)">🍔 Food</button>
+    <button class="tab-btn active" onclick="showTab('food', this)">🍔 Food & Orders</button>
     <button class="tab-btn" onclick="showTab('rooms', this)">🏫 Rooms</button>
     <button class="tab-btn" onclick="showTab('library', this)">📚 Library</button>
     <button class="tab-btn" onclick="showTab('events', this)">📅 Events</button>
 </div>
 
 <div class="tab-container">
-
+    
     <div id="food" class="tab-content active">
         
         <div id="vendor-view">
-            <h2>Select a Vendor</h2>
+            <h2>Campus Food Court</h2>
             <div class="food-grid">
                 {% for vendor in vendors %}
-                <div class="food-card" onclick="openMenu('{{ vendor[1] }}')" style="cursor: pointer; border: 2px solid transparent; transition: 0.3s;" onmouseover="this.style.borderColor='#38bdf8'" onmouseout="this.style.borderColor='transparent'">
+                <div class="food-card" onclick="openMenu('{{ vendor[1] }}')" style="cursor: pointer; transition: 0.3s;" onmouseover="this.style.border='2px solid #38bdf8'" onmouseout="this.style.border='2px solid transparent'">
                     <i class="fa fa-shop fa-3x" style="color: #38bdf8; margin-bottom: 15px;"></i>
-                    <h3>{{ vendor[1] }}</h3>
-                    <p style="color: #10b981; font-weight: bold;">Open</p>
+                    <h3 style="margin-bottom: 5px;">{{ vendor[1] }}</h3>
+                    <p style="font-size: 12px; color: #94a3b8;"><i class="fa fa-clock"></i> {{ vendor[5] }} - {{ vendor[6] }}</p>
+                    <p style="color: #10b981; font-weight: bold; margin-top: 5px;">Open</p>
                 </div>
                 {% else %}
-                <p>No vendors are currently open.</p>
+                <p style="color: #94a3b8;">No vendors are currently open.</p>
                 {% endfor %}
             </div>
-        </div>
 
-        <div id="menu-view" style="display: none;">
+            <hr style="border-color: #334155; margin: 40px 0;">
+
+            <h2><i class="fa fa-motorcycle"></i> Live Tracking</h2>
+            <div class="food-grid" style="margin-bottom: 40px;">
+                {% for order in active_orders %}
+                <div class="food-card" style="border-top: 5px solid {{ '#ef4444' if order[5] == 'Pending' else ('#f59e0b' if order[5] == 'Preparing' else '#10b981') }}; text-align: left;">
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #334155; padding-bottom: 10px; margin-bottom: 10px;">
+                        <strong>#{{ order[0] }} - {{ order[1] }}</strong>
+                        <span style="font-size: 12px; background: #334155; padding: 3px 8px; border-radius: 4px;">{{ order[5] }}</span>
+                    </div>
+                    <p style="margin: 5px 0; font-size: 15px;">{{ order[2] }} <strong>(x{{ order[3] }})</strong></p>
+                    <p style="margin: 5px 0; color: #10b981;">₹{{ order[4] }}</p>
+                    <div style="margin-top: 15px; padding: 10px; background: #0f172a; border-radius: 5px; text-align: center;">
+                        <p style="margin: 0; font-size: 12px; color: #94a3b8;">Estimated Time:</p>
+                        <h3 style="margin: 5px 0; color: #38bdf8;">{{ order[6] }}</h3>
+                    </div>
+                </div>
+                {% else %}
+                <p style="color: #94a3b8; grid-column: 1 / -1;">You have no active orders right now.</p>
+                {% endfor %}
+            </div>
+
+            <h2><i class="fa fa-clock-rotate-left"></i> Order History</h2>
+            <table style="width:100%; border-collapse: collapse; background: #1e293b; border-radius: 10px; overflow: hidden; font-size: 14px; margin-bottom: 30px;">
+                <thead style="background: #334155;">
+                    <tr>
+                        <th style="padding: 12px; text-align: left;">Order ID</th>
+                        <th style="padding: 12px; text-align: left;">Date</th>
+                        <th style="padding: 12px; text-align: left;">Vendor</th>
+                        <th style="padding: 12px; text-align: left;">Item</th>
+                        <th style="padding: 12px; text-align: left;">Total</th>
+                        <th style="padding: 12px; text-align: left;">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for past in past_orders %}
+                    <tr style="border-bottom: 1px solid #334155;">
+                        <td style="padding: 12px;">#{{ past[0] }}</td>
+                        <td style="padding: 12px; color: #94a3b8;">{{ past[6] }}</td>
+                        <td style="padding: 12px;">{{ past[1] }}</td>
+                        <td style="padding: 12px;">{{ past[2] }} (x{{ past[3] }})</td>
+                        <td style="padding: 12px;">₹{{ past[4] }}</td>
+                        <td style="padding: 12px; font-weight: bold; color: {{ '#10b981' if past[5] == 'Completed' else '#ef4444' }};">{{ past[5] }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" style="padding: 12px; text-align: center; color: #94a3b8;">No past orders found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div> <div id="menu-view" style="display: none;">
             <button onclick="backToVendors()" style="background: #334155; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; margin-bottom: 20px;">
-                <i class="fa fa-arrow-left"></i> Back to Vendors
+                <i class="fa fa-arrow-left"></i> Back to Vendors & Orders
             </button>
-            
             <h2 id="menu-title">Menu</h2>
-
             <div class="food-grid" id="dynamic-menu"></div>
         </div>
-
+    </div>
+    
+    <div id="rooms" class="tab-content">
+        <h2>Group Discussion Rooms</h2>
+        <div class="food-grid">
+            {% for room in rooms %}
+            <div class="food-card" style="border-top: 4px solid {{ '#10b981' if room[2] == 'Available' else '#ef4444' }};">
+                <i class="fa fa-users fa-2x" style="color: #94a3b8;"></i>
+                <h3>{{ room[1] }}</h3>
+                <p style="color: {{ '#10b981' if room[2] == 'Available' else '#ef4444' }}; font-weight: bold;">{{ room[2] }}</p>
+                {% if room[2] == 'Available' %}
+                <button style="margin-top: 10px; background: #38bdf8; color: black; padding: 8px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">Book Room</button>
+                {% endif %}
+            </div>
+            {% else %}
+            <p style="color: #94a3b8;">No rooms available.</p>
+            {% endfor %}
+        </div>
     </div>
 
-    <div id="rooms" class="tab-content"><h2>Room Booking</h2><p>Coming soon...</p></div>
-    <div id="library" class="tab-content"><h2>Library Seats</h2><p>Coming soon...</p></div>
-    <div id="events" class="tab-content"><h2>Upcoming Events</h2><p>Coming soon...</p></div>
+    <div id="library" class="tab-content">
+        <h2>Library Seat Booking</h2>
+        <div class="food-grid">
+            {% for seat in seats %}
+            <div class="food-card" style="border-top: 4px solid {{ '#10b981' if seat[2] == 'Available' else '#ef4444' }};">
+                <i class="fa fa-chair fa-2x" style="color: #94a3b8;"></i>
+                <h3>{{ seat[1] }}</h3>
+                <p style="color: {{ '#10b981' if seat[2] == 'Available' else '#ef4444' }}; font-weight: bold;">{{ seat[2] }}</p>
+                {% if seat[2] == 'Available' %}
+                <button style="margin-top: 10px; background: #10b981; color: white; padding: 8px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">Reserve Seat</button>
+                {% endif %}
+            </div>
+            {% else %}
+            <p style="color: #94a3b8;">No seats available.</p>
+            {% endfor %}
+        </div>
+    </div>
 
+    <div id="events" class="tab-content">
+        <h2>Upcoming Events</h2>
+        <div class="food-grid">
+            {% for event in events %}
+            <div class="food-card" style="text-align: left; border-left: 4px solid #f59e0b;">
+                <h3 style="color: #f59e0b; margin-top: 0;">{{ event[1] }}</h3>
+                <p style="font-size: 12px; color: #94a3b8; margin-bottom: 10px;"><i class="fa fa-calendar"></i> {{ event[3] }}</p>
+                <p>{{ event[2] }}</p>
+            </div>
+            {% else %}
+            <p style="color: #94a3b8;">No events scheduled right now.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+
+<div id="customModal" class="custom-modal">
+    <div class="custom-box">
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #334155; padding-bottom: 10px;">
+            <h3 id="c-title" style="margin: 0; color: #38bdf8;">Item Name</h3>
+            <i class="fa fa-xmark" style="cursor: pointer; font-size: 20px;" onclick="closeCustomModal()"></i>
+        </div>
+        
+        <div id="c-size-section" class="custom-section" style="display: none;">
+            <h4 style="margin-top: 0; margin-bottom: 10px;">Select Size</h4>
+            <label class="custom-option"><span id="c-half-text">Half Plate (₹0)</span> <input type="radio" name="c_size" id="c-half-radio" value="Half"></label>
+            <label class="custom-option"><span id="c-full-text">Full Plate (₹0)</span> <input type="radio" name="c_size" id="c-full-radio" value="Full" checked></label>
+        </div>
+
+        <div id="c-addon-section" class="custom-section" style="display: none;">
+            <h4 style="margin-top: 0; margin-bottom: 10px;">Preferences / Add-ons</h4>
+            <div id="c-addon-list"></div>
+        </div>
+
+        <button onclick="confirmCustomization()" style="width: 100%; margin-top: 20px; background: #10b981; color: white; padding: 12px; border-radius: 8px; font-weight: bold; border: none; cursor: pointer;">Add to Cart</button>
+    </div>
 </div>
 
 {% include 'cart.html' %}
 <div id="toast" class="toast">Added to cart</div>
 
 <script src="/static/script.js"></script>
-
 <script>
-    // Fetch dynamic menu items based on selected vendor
+    // Global variables to hold item data for the modal
+    let currentItem = null;
+    let currentVendor = "";
+
     function openMenu(vendorName) {
         document.getElementById('vendor-view').style.display = 'none';
         document.getElementById('menu-view').style.display = 'block';
         document.getElementById('menu-title').innerText = vendorName + " - Menu";
-        
-        document.getElementById('dynamic-menu').innerHTML = "<p>Loading menu...</p>";
+        currentVendor = vendorName;
 
-        fetch('/get_menu/' + encodeURIComponent(vendorName))
-            .then(res => res.json())
-            .then(data => {
-                let html = '';
-                if(data.length === 0) {
-                    html = '<p>No items available for this vendor currently.</p>';
-                } else {
-                    data.forEach(item => {
-                        html += `
-                        <div class="food-card">
-                            <i class="fa ${item.icon} fa-2x"></i>
-                            <h3>${item.name} ₹${item.price}</h3>
-                            <button onclick="addToCart('${item.name}', ${item.price}, '${vendorName}')">Add</button>
-                        </div>
-                        `;
-                    });
-                }
-                document.getElementById('dynamic-menu').innerHTML = html;
+        fetch('/get_menu/' + encodeURIComponent(vendorName)).then(res => res.json()).then(data => {
+            let html = '';
+            data.forEach(item => {
+                let dietIcon = item.diet === 'Veg' ? '🟢' : '🔴';
+                let btnHtml = item.is_customizable === 'Yes' 
+                    ? `<button onclick='openCustomModal(${JSON.stringify(item)})' style="background: #f59e0b; color: black; font-weight: bold; margin-top: 10px; width: 100%; padding: 8px; border: none; border-radius: 5px; cursor: pointer;">Customize & Add</button>`
+                    : `<button onclick="addToCart('${item.name}', ${item.price}, '${vendorName}')" style="margin-top: 10px; width: 100%; background: #38bdf8; color: black; padding: 8px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">Add</button>`;
+
+                html += `
+                <div class="food-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <div style="font-size: 12px; margin-bottom: 10px; color: #cbd5e1; text-align: left;">${dietIcon} ${item.category}</div>
+                        <i class="fa ${item.icon} fa-2x" style="margin-bottom: 10px; color: #94a3b8;"></i>
+                        <h3>${item.name} ₹${item.price}</h3>
+                        <p style="font-size: 12px; color: #94a3b8; height: 35px; overflow: hidden; margin-top: 5px;">${item.desc}</p>
+                    </div>
+                    ${btnHtml}
+                </div>`;
             });
+            document.getElementById('dynamic-menu').innerHTML = html || '<p style="color: #94a3b8;">No items available right now.</p>';
+        });
     }
 
-    function backToVendors() {
-        document.getElementById('menu-view').style.display = 'none';
-        document.getElementById('vendor-view').style.display = 'block';
+    function openCustomModal(item) {
+        currentItem = item;
+        document.getElementById("c-title").innerText = item.name;
+        
+        // Size Options
+        if (item.half_price > 0) {
+            document.getElementById("c-size-section").style.display = "block";
+            document.getElementById("c-half-text").innerText = `Half Plate (₹${item.half_price})`;
+            document.getElementById("c-full-text").innerText = `Full Plate (₹${item.price})`;
+            document.getElementById("c-half-radio").value = item.half_price;
+            document.getElementById("c-full-radio").value = item.price;
+            document.getElementById("c-full-radio").checked = true;
+        } else {
+            document.getElementById("c-size-section").style.display = "none";
+        }
+
+        // Addons Options
+        if (item.addons && item.addons.trim() !== "") {
+            document.getElementById("c-addon-section").style.display = "block";
+            let addons = item.addons.split(",");
+            let addonHtml = "";
+            addons.forEach((addon, index) => {
+                let cleanAddon = addon.trim();
+                if (cleanAddon) {
+                    addonHtml += `<label class="custom-option"><span>${cleanAddon}</span> <input type="checkbox" class="c-addon-cb" value="${cleanAddon}"></label>`;
+                }
+            });
+            document.getElementById("c-addon-list").innerHTML = addonHtml;
+        } else {
+            document.getElementById("c-addon-section").style.display = "none";
+        }
+
+        document.getElementById("customModal").style.display = "flex";
+    }
+
+    function closeCustomModal() {
+        document.getElementById("customModal").style.display = "none";
+    }
+
+    function confirmCustomization() {
+        let finalName = currentItem.name;
+        let finalPrice = currentItem.price;
+
+        // Check Size
+        if (currentItem.half_price > 0) {
+            if (document.getElementById("c-half-radio").checked) {
+                finalName += " (Half)";
+                finalPrice = parseInt(document.getElementById("c-half-radio").value);
+            } else {
+                finalName += " (Full)";
+            }
+        }
+
+        // Check Addons
+        let selectedAddons = [];
+        document.querySelectorAll(".c-addon-cb:checked").forEach(cb => {
+            selectedAddons.push(cb.value);
+        });
+        
+        if (selectedAddons.length > 0) {
+            finalName += " [" + selectedAddons.join(", ") + "]";
+        }
+
+        addToCart(finalName, finalPrice, currentVendor);
+        closeCustomModal();
+    }
+
+    function backToVendors() { 
+        document.getElementById('menu-view').style.display = 'none'; 
+        document.getElementById('vendor-view').style.display = 'block'; 
     }
 </script>
-
 </body>
 </html>

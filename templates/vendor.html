@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{{ vendor_name }} - Kitchen Dashboard</title>
+    <title>{{ vendor_name }} - Kitchen</title>
     <link rel="stylesheet" href="/static/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
@@ -10,54 +10,153 @@
 <header class="main-header">
     <h2><i class="fa-solid fa-fire-burner"></i> {{ vendor_name }} Kitchen</h2>
     <div>
-        <span style="color: #10b981; margin-right: 20px;">● Accepting Orders</span>
+        <span style="color: #10b981; margin-right: 20px;">● Online</span>
         <a href="/logout" class="logout-btn">Logout</a>
     </div>
 </header>
 
-<div class="container">
-    <h2 style="margin-bottom: 20px;">Live Tickets</h2>
-    
-    <div class="food-grid">
-        {% for order in orders %}
-        <div class="food-card" style="border-top: 5px solid {{ '#f59e0b' if order[4] == 'Preparing' else '#10b981' }}; text-align: left;">
-            
-            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; padding-bottom: 10px; margin-bottom: 10px;">
-                <h3 style="margin: 0;">#{{ order[0] }}</h3>
-                <span style="background: {{ '#f59e0b' if order[4] == 'Preparing' else '#10b981' }}; color: {{ 'black' if order[4] == 'Preparing' else 'white' }}; padding: 3px 8px; border-radius: 5px; font-size: 12px; font-weight: bold;">
-                    {{ order[4] }}
-                </span>
-            </div>
-            
-            <p style="margin: 5px 0;"><i class="fa-solid fa-user" style="color: #94a3b8; width: 20px;"></i> <strong>{{ order[1] }}</strong></p>
-            <p style="margin: 5px 0; font-size: 18px;"><i class="fa-solid fa-utensils" style="color: #94a3b8; width: 20px;"></i> {{ order[2] }} <strong>(x{{ order[3] }})</strong></p>
-            
-            {% if order[4] == 'Preparing' %}
-            <form action="/vendor/update_order/{{ order[0] }}" method="POST" style="margin-top: 15px;">
-                <input type="hidden" name="action" value="ready">
-                <button type="submit" style="width: 100%; background: #38bdf8; color: black; font-weight: bold; padding: 10px; border-radius: 6px; cursor: pointer;">
-                    <i class="fa-solid fa-bell"></i> Mark as Ready
-                </button>
-            </form>
-            {% else %}
-            <form action="/vendor/update_order/{{ order[0] }}" method="POST" style="margin-top: 15px;">
-                <input type="hidden" name="action" value="completed">
-                <button type="submit" style="width: 100%; background: #10b981; color: white; font-weight: bold; padding: 10px; border-radius: 6px; cursor: pointer;">
-                    <i class="fa-solid fa-check-double"></i> Handed to Student
-                </button>
-            </form>
-            {% endif %}
-
-        </div>
-        {% else %}
-        <div style="grid-column: 1 / -1; text-align: center; padding: 50px; background: #1e293b; border-radius: 15px;">
-            <i class="fa-solid fa-mug-hot fa-4x" style="color: #475569; margin-bottom: 15px;"></i>
-            <h3 style="color: #94a3b8;">No pending orders right now.</h3>
-            <p style="color: #64748b;">The kitchen is clear!</p>
-        </div>
-        {% endfor %}
-    </div>
+<div class="tabs">
+    <button class="tab-btn active" onclick="showTab('live-orders', this)">🔔 Live Orders</button>
+    <button class="tab-btn" onclick="showTab('my-menu', this)">📋 Manage Menu</button>
 </div>
 
+<div class="container">
+    
+    <div id="live-orders" class="tab-content active">
+        <div class="food-grid">
+            {% for order in orders %}
+            <div class="food-card" style="border-top: 5px solid {{ '#ef4444' if order[4] == 'Pending' else ('#f59e0b' if order[4] == 'Preparing' else '#10b981') }}; text-align: left;">
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; padding-bottom: 10px; margin-bottom: 10px;">
+                    <h3 style="margin: 0;">#{{ order[0] }}</h3>
+                    <span style="background: {{ '#ef4444' if order[4] == 'Pending' else ('#f59e0b' if order[4] == 'Preparing' else '#10b981') }}; color: {{ 'white' if order[4] in ['Pending','Ready to Pickup'] else 'black' }}; padding: 3px 8px; border-radius: 5px; font-size: 12px; font-weight: bold;">
+                        {{ order[4] }}
+                    </span>
+                </div>
+                
+                <p style="margin: 5px 0;"><i class="fa-solid fa-user" style="color: #94a3b8; width: 20px;"></i> <strong>{{ order[1] }}</strong></p>
+                <p style="margin: 5px 0; font-size: 18px;"><i class="fa-solid fa-utensils" style="color: #94a3b8; width: 20px;"></i> {{ order[2] }} <strong>(x{{ order[3] }})</strong></p>
+                <p style="margin: 5px 0; color: #10b981; font-weight: bold;"><i class="fa-solid fa-indian-rupee-sign" style="color: #94a3b8; width: 20px;"></i> {{ order[5] }}</p>
+                
+                <hr style="border-color: #334155; margin: 15px 0;">
+
+                {% if order[4] == 'Pending' %}
+                    <p style="font-size: 12px; color: #cbd5e1;">Awaiting your approval:</p>
+                    <form action="/vendor/order_action/{{ order[0] }}" method="POST" style="display: flex; gap: 5px; margin-bottom: 5px;">
+                        <input type="hidden" name="action" value="accept">
+                        <input type="number" name="prep_time" placeholder="Mins?" required value="15" style="width: 60px; padding: 8px; border-radius: 5px; border: none; background: #0f172a; color: white;">
+                        <button type="submit" style="background: #10b981; color: white; flex: 1; border-radius: 5px;"><i class="fa fa-check"></i> Accept</button>
+                    </form>
+                    <form action="/vendor/order_action/{{ order[0] }}" method="POST">
+                        <input type="hidden" name="action" value="reject">
+                        <button type="submit" style="width: 100%; background: #7f1d1d; color: white; padding: 8px; border-radius: 5px;"><i class="fa fa-xmark"></i> Reject Order</button>
+                    </form>
+
+                {% elif order[4] == 'Preparing' %}
+                    <p style="font-size: 12px; color: #cbd5e1;">ETA given: {{ order[6] }}</p>
+                    <form action="/vendor/order_action/{{ order[0] }}" method="POST" style="display: flex; gap: 5px; margin-bottom: 5px;">
+                        <input type="hidden" name="action" value="extend">
+                        <input type="number" name="extra_time" placeholder="New ETA?" required style="width: 80px; padding: 8px; border-radius: 5px; border: none; background: #0f172a; color: white;">
+                        <button type="submit" style="background: #475569; color: white; flex: 1; border-radius: 5px;">Update Time</button>
+                    </form>
+                    <form action="/vendor/order_action/{{ order[0] }}" method="POST" style="margin-top: 10px;">
+                        <input type="hidden" name="action" value="ready">
+                        <button type="submit" style="width: 100%; background: #38bdf8; color: black; font-weight: bold; padding: 10px; border-radius: 6px;"><i class="fa-solid fa-bell"></i> Mark as Ready</button>
+                    </form>
+
+                {% elif order[4] == 'Ready to Pickup' %}
+                    <p style="font-size: 12px; color: #cbd5e1;">Waiting for student...</p>
+                    <form action="/vendor/order_action/{{ order[0] }}" method="POST">
+                        <input type="hidden" name="action" value="completed">
+                        <button type="submit" style="width: 100%; background: #10b981; color: white; font-weight: bold; padding: 10px; border-radius: 6px;"><i class="fa-solid fa-check-double"></i> Handed to Student</button>
+                    </form>
+                {% endif %}
+
+            </div>
+            {% else %}
+            <div style="grid-column: 1 / -1; text-align: center; padding: 50px; background: #1e293b; border-radius: 15px;">
+                <h3 style="color: #94a3b8;">No pending orders right now.</h3>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div id="my-menu" class="tab-content">
+        
+        <div style="background: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+            <h3><i class="fa fa-plus-circle"></i> Add New Item to My Menu</h3>
+            <form action="/vendor/add_food" method="POST" style="display: flex; flex-direction: column; gap: 8px; background: #0f172a; padding: 15px; border-radius: 8px; border: 1px solid #334155; max-width: 600px; margin-top: 15px;">
+                
+                <div style="display: flex; gap: 5px;">
+                    <input type="text" name="item_name" placeholder="Item Name (e.g. Chicken Curry)" required style="padding: 10px; border-radius: 5px; background: #1e293b; color: white; border: 1px solid #334155; flex: 2;">
+                    <input type="number" name="price" placeholder="Full Price (₹)" required style="padding: 10px; border-radius: 5px; background: #1e293b; color: white; border: 1px solid #334155; flex: 1;">
+                </div>
+                
+                <div style="display: flex; gap: 5px;">
+                    <select name="diet" style="padding: 10px; border-radius: 5px; background: #1e293b; color: white; border: 1px solid #334155; width: 30%;">
+                        <option value="Veg">Veg</option><option value="Non-Veg">Non-Veg</option>
+                    </select>
+                    <select name="category" style="padding: 10px; border-radius: 5px; background: #1e293b; color: white; border: 1px solid #334155; flex: 1;">
+                        <option value="Main Course">Main</option><option value="Beverage">Beverage</option><option value="Snack">Snack</option>
+                    </select>
+                    <input type="text" name="icon" placeholder="Icon (e.g. fa-bowl-food)" style="padding: 10px; border-radius: 5px; background: #1e293b; color: white; border: 1px solid #334155; width: 30%;">
+                </div>
+                
+                <input type="text" name="description" placeholder="Short description" style="padding: 10px; border-radius: 5px; background: #1e293b; color: white; border: 1px solid #334155;">
+                
+                <hr style="border-color: #334155; margin: 10px 0;">
+                
+                <label style="font-size: 14px; color: #38bdf8; display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                    <input type="checkbox" name="is_customizable" value="Yes" onchange="this.parentElement.nextElementSibling.style.display = this.checked ? 'block' : 'none'">
+                    Enable Size Variations & Add-ons
+                </label>
+                
+                <div style="display: none; background: #1e293b; padding: 15px; border-radius: 5px; margin-top: 5px;">
+                    <input type="number" name="half_price" placeholder="Half Plate Price (Leave empty if none)" style="width: 100%; padding: 10px; border-radius: 5px; background: #0f172a; color: white; border: 1px solid #334155; margin-bottom: 10px; box-sizing: border-box;">
+                    <input type="text" name="addons" placeholder="Add-ons (Comma separated: Butter Naan, Rice)" style="width: 100%; padding: 10px; border-radius: 5px; background: #0f172a; color: white; border: 1px solid #334155; box-sizing: border-box;">
+                    <small style="color: #94a3b8; font-size: 12px; display: block; margin-top: 5px;">Students will select these in a popup before adding to cart.</small>
+                </div>
+
+                <button type="submit" style="background: #38bdf8; color: black; padding: 12px; border-radius: 5px; margin-top: 10px; font-weight: bold; cursor: pointer;">Publish Item</button>
+            </form>
+        </div>
+
+        <h3>Current Menu</h3>
+        <div class="food-grid">
+            {% for item in menu_items %}
+            <div style="background: #1e293b; padding: 15px; border-radius: 8px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <strong><i class="fa {{ item[4] }}"></i> {{ item[2] }} (₹{{ item[3] }})</strong>
+                    <span style="font-size: 12px; color: {{ '#10b981' if item[5] == 'Available' else '#ef4444' }};">{{ item[5] }}</span>
+                </div>
+                <div style="font-size: 12px; color: #94a3b8; margin-top: 5px; margin-bottom: 10px;">{{ item[6] }} | {{ item[7] }}</div>
+                
+                <div style="display: flex; gap: 5px;">
+                    <form action="/vendor/toggle_food/{{ item[0] }}" method="POST" style="flex: 1;">
+                        <button type="submit" style="width: 100%; padding: 6px; font-size: 12px; background: #475569; color: white; border-radius: 4px; border: none; cursor: pointer;">Toggle Stock</button>
+                    </form>
+                    <form action="/vendor/delete_food/{{ item[0] }}" method="POST" style="flex: 1;">
+                        <button type="submit" style="width: 100%; padding: 6px; font-size: 12px; background: #7f1d1d; color: white; border-radius: 4px; border: none; cursor: pointer;">Delete</button>
+                    </form>
+                </div>
+                <form action="/vendor/edit_food_price/{{ item[0] }}" method="POST" style="display: flex; gap: 5px; margin-top: 5px;">
+                    <input type="number" name="new_price" placeholder="New ₹" required style="width: 60px; padding: 6px; border-radius: 4px; border: none; background: #0f172a; color: white;">
+                    <button type="submit" style="padding: 6px; font-size: 12px; background: #f59e0b; color: black; flex: 1; border-radius: 4px; border: none; cursor: pointer;">Update Price</button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function showTab(id, btn) {
+        document.querySelectorAll(".tab-content").forEach(t => t.classList.remove("active"));
+        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+        document.getElementById(id).classList.add("active");
+        btn.classList.add("active");
+    }
+</script>
 </body>
 </html>
