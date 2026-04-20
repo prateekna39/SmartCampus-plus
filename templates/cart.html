@@ -4,27 +4,32 @@
 </div>
 
 <div class="cart-drawer" id="cartDrawer">
-
     <div class="cart-header">
-        <h3>Your Cart</h3>
-        <span class="cart-close" onclick="closeCart()">✖</span>
+        <h3 style="margin: 0; color: #38bdf8; font-size: 24px;">Your Cart</h3>
+        <i class="fa fa-xmark cart-close" onclick="closeCart()" style="font-size: 26px; color: #94a3b8; cursor: pointer;"></i>
     </div>
-
     <div id="cart-items" class="cart-items"></div>
-
     <div class="cart-footer">
-        <h4 id="cart-total">Total: ₹0</h4>
-        <button class="pay-btn" onclick="openPayment()">Pay</button>
+        <h4 id="cart-total" style="color: white; font-size: 20px; margin-bottom: 20px;">Total: ₹0</h4>
+        <button class="pay-btn" onclick="openPayment()">Proceed to Pay</button>
     </div>
-
 </div>
 
 <div id="paymentModal" class="payment-modal">
-    <div class="payment-box">
-        <span class="close-btn" onclick="closePayment()">✖</span>
-        <h3>Select Payment Method</h3>
-        <button onclick="placeOrder()">UPI</button>
-        <button onclick="placeOrder()">Card</button>
-        <button onclick="placeOrder()">Cash</button>
+    <div class="payment-box" style="position: relative; text-align: center;">
+        <i class="fa fa-xmark" onclick="closePayment()" style="position: absolute; top: 20px; right: 20px; cursor: pointer; color: #94a3b8; font-size: 24px; transition: 0.2s;" onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='#94a3b8'"></i>
+        <h2 style="margin-top: 0; color: #38bdf8; margin-bottom: 30px; font-size: 26px;">Payment Method</h2>
+        
+        <div style="display: flex; gap: 15px; justify-content: center;">
+            <button onclick="placeOrder()" style="flex: 1; padding: 20px 10px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(16, 185, 129, 0.2); color: #10b981; font-weight: bold; cursor: pointer; font-size: 15px; transition: 0.3s; backdrop-filter: blur(5px);" onmouseover="this.style.background='#10b981'; this.style.color='white'; this.style.transform='translateY(-5px)';" onmouseout="this.style.background='rgba(16, 185, 129, 0.2)'; this.style.color='#10b981'; this.style.transform='translateY(0)';">
+                <i class="fa-solid fa-qrcode" style="margin-bottom: 8px; font-size: 24px; display: block;"></i> UPI
+            </button>
+            <button onclick="placeOrder()" style="flex: 1; padding: 20px 10px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(59, 130, 246, 0.2); color: #3b82f6; font-weight: bold; cursor: pointer; font-size: 15px; transition: 0.3s; backdrop-filter: blur(5px);" onmouseover="this.style.background='#3b82f6'; this.style.color='white'; this.style.transform='translateY(-5px)';" onmouseout="this.style.background='rgba(59, 130, 246, 0.2)'; this.style.color='#3b82f6'; this.style.transform='translateY(0)';">
+                <i class="fa-solid fa-credit-card" style="margin-bottom: 8px; font-size: 24px; display: block;"></i> Card
+            </button>
+            <button onclick="placeOrder()" style="flex: 1; padding: 20px 10px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(245, 158, 11, 0.2); color: #f59e0b; font-weight: bold; cursor: pointer; font-size: 15px; transition: 0.3s; backdrop-filter: blur(5px);" onmouseover="this.style.background='#f59e0b'; this.style.color='#0f172a'; this.style.transform='translateY(-5px)';" onmouseout="this.style.background='rgba(245, 158, 11, 0.2)'; this.style.color='#f59e0b'; this.style.transform='translateY(0)';">
+                <i class="fa-solid fa-money-bill-wave" style="margin-bottom: 8px; font-size: 24px; display: block;"></i> Cash
+            </button>
+        </div>
     </div>
 </div>

@@ -1,134 +1,762 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Admin Page</title>
+    <title>Admin Dashboard | SmartCampus+</title>
     <link rel="stylesheet" href="/static/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        .grid-2-col { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+            gap: 20px; 
+        }
+        .grid-3-col { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+            gap: 20px; 
+        }
+        .section-title { 
+            font-size: 26px; 
+            font-weight: 700; 
+            color: #f8fafc; 
+            margin-top: 0; 
+            margin-bottom: 30px; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px;
+        }
+        .section-title i { 
+            color: #38bdf8; 
+        }
+        .vendor-menu-container { 
+            background: rgba(15, 23, 42, 0.6); 
+            padding: 20px; 
+            border-radius: 15px; 
+            margin-bottom: 25px; 
+            max-height: 400px; 
+            overflow-y: auto; 
+            border: 1px solid rgba(255,255,255,0.05); 
+        }
+        .menu-item-row { 
+            background: rgba(30, 41, 59, 0.6); 
+            padding: 20px; 
+            border-radius: 12px; 
+            margin-bottom: 15px; 
+            border-left: 5px solid #38bdf8; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+    </style>
 </head>
 <body>
 
+<div class="bg-shapes">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+</div>
+
 <header class="main-header">
-    <h2><i class="fa-solid fa-user-tie"></i> Admin Page</h2>
-    <a href="/logout" class="logout-btn">Logout</a>
+    <div style="display: flex; align-items: center; gap: 12px;">
+        <i class="fa-solid fa-shield-halved fa-2x" style="color: #38bdf8; filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.5));"></i>
+        <h2 style="margin:0; font-size: 24px; font-weight: 700; letter-spacing: -1px;">Admin Command Center</h2>
+    </div>
+    <a href="/logout" class="action-btn" style="background: rgba(239,68,68,0.2); color: #fca5a5; border: 1px solid rgba(239,68,68,0.5);">
+        <i class="fa fa-sign-out-alt"></i> Secure Logout
+    </a>
 </header>
 
 <div class="tabs">
-    <button class="tab-btn active" onclick="showTab('vendors-tab', this)">🍔 Vendors & Menus</button>
-    <button class="tab-btn" onclick="showTab('students-tab', this)">👥 Students</button>
-    <button class="tab-btn" onclick="showTab('rooms-tab', this)">🏫 Rooms & Seats</button>
-    <button class="tab-btn" onclick="showTab('events-tab', this)">📅 Events</button>
+    <button class="tab-btn active" onclick="showTab('vendors-tab', this)">
+        <i class="fa fa-shop"></i> Vendors & Menu
+    </button>
+    <button class="tab-btn" onclick="showTab('students-tab', this)">
+        <i class="fa fa-users"></i> Students
+    </button>
+    <button class="tab-btn" onclick="showTab('rooms-tab', this)">
+        <i class="fa fa-door-open"></i> Rooms
+    </button>
+    <button class="tab-btn" onclick="showTab('seats-tab', this)">
+        <i class="fa fa-chair"></i> Library
+    </button>
+    <button class="tab-btn" onclick="showTab('events-tab', this)">
+        <i class="fa fa-calendar-check"></i> Events
+    </button>
 </div>
 
-<div class="container">
+<div class="container" style="max-width: 1400px; margin: auto;">
+    
     <div id="vendors-tab" class="tab-content active">
-        <div style="background:#1e293b; padding:20px; border-radius:8px; margin-bottom:30px;">
-            <h3><i class="fa fa-plus"></i> Register New Vendor</h3>
-            <form action="/admin/add_vendor" method="POST" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-top:15px;"><input type="text" name="vendor_name" placeholder="Restaurant Name" required style="padding:10px; border-radius:5px; background:#0f172a; color:white; border:1px solid #334155;"><input type="text" name="vendor_username" placeholder="Login Username" required style="padding:10px; border-radius:5px; background:#0f172a; color:white; border:1px solid #334155;"><input type="text" name="vendor_password" placeholder="Login Password" required style="padding:10px; border-radius:5px; background:#0f172a; color:white; border:1px solid #334155;"><input type="text" name="opening_time" placeholder="Opens At" required style="padding:10px; border-radius:5px; background:#0f172a; color:white; border:1px solid #334155;"><input type="text" name="closing_time" placeholder="Closes At" required style="padding:10px; border-radius:5px; background:#0f172a; color:white; border:1px solid #334155;"><input type="text" name="location" placeholder="Location" required style="padding:10px; border-radius:5px; background:#0f172a; color:white; border:1px solid #334155;"><input type="text" name="contact_name" placeholder="Owner Name (Optional)" style="padding:10px; border-radius:5px; background:#0f172a; color:white; border:1px solid #334155;"><input type="text" name="phone" placeholder="Contact Phone (Optional)" style="padding:10px; border-radius:5px; background:#0f172a; color:white; border:1px solid #334155;"><button type="submit" style="background:#38bdf8; color:black; font-weight:bold; border-radius:5px; cursor:pointer;">Add Vendor</button></form>
+        
+        <div class="admin-section-box">
+            <h2 class="section-title"><i class="fa fa-plus-circle"></i> Register New Vendor</h2>
+            <form action="/admin/add_vendor" method="POST" class="grid-3-col">
+                <input class="clean-input" type="text" name="vendor_name" placeholder="Restaurant Name" required>
+                <input class="clean-input" type="text" name="vendor_username" placeholder="Login Username" required>
+                <input class="clean-input" type="text" name="vendor_password" placeholder="Login Password" required>
+                <input class="clean-input" type="text" name="opening_time" placeholder="Opens At (09:00 AM)" required>
+                <input class="clean-input" type="text" name="closing_time" placeholder="Closes At (05:00 PM)" required>
+                <input class="clean-input" type="text" name="location" placeholder="Location" required>
+                <input class="clean-input" type="text" name="contact_name" placeholder="Owner Name" required>
+                <input class="clean-input" type="text" name="phone" placeholder="Phone" required>
+                <button type="submit" class="action-btn btn-blue" style="margin-bottom: 15px; font-size: 16px;">
+                    <i class="fa fa-save"></i> Add Vendor
+                </button>
+            </form>
         </div>
-        <div class="food-grid">
+
+        <div class="food-grid" style="grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));">
             {% for vendor in vendors %}
-            <div class="food-card" style="border-top: 5px solid {{ '#10b981' if vendor[2] == 'Open' else '#ef4444' }}; text-align: left;">
-                <div style="text-align: center;"><i class="fa fa-shop fa-2x"></i><h3 style="margin: 5px 0;">{{ vendor[1] }}</h3><p style="font-size: 12px; color: #94a3b8; margin: 0;"><i class="fa fa-clock"></i> {{ vendor[5] }} - {{ vendor[6] }}</p><p>Status: <strong style="color: {{ '#10b981' if vendor[2] == 'Open' else '#ef4444' }};">{{ vendor[2] }}</strong></p></div>
-                <div style="display: flex; gap: 5px; margin-top: 15px;"><button onclick="document.getElementById('edit-vendor-{{vendor[0]}}').style.display='block'" style="flex: 1; padding: 8px; background: #f59e0b; color: black; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;"><i class="fa fa-pen"></i> Edit</button><form action="/admin/toggle_vendor/{{ vendor[0] }}" method="POST" style="flex: 1;"><button type="submit" style="width: 100%; padding: 8px; background: {{ '#ef4444' if vendor[2] == 'Open' else '#10b981' }}; border: none; border-radius: 4px; color: white; cursor: pointer;">{{ 'Close' if vendor[2] == 'Open' else 'Open' }}</button></form><form action="/admin/delete_vendor/{{ vendor[0] }}" method="POST" style="flex: 1;" onsubmit="return confirm('Delete?');"><button type="submit" style="width: 100%; padding: 8px; background: #475569; color: white; border: none; border-radius: 4px; cursor: pointer;"><i class="fa fa-trash"></i></button></form></div>
+            <div class="admin-section-box" style="border-top: 6px solid {{ '#10b981' if vendor[2] == 'Open' else '#ef4444' }}; padding: 35px;">
                 
-                <div id="edit-vendor-{{vendor[0]}}" style="display: none; background: #0f172a; padding: 15px; border-radius: 8px; border: 1px solid #334155; margin-top: 15px;"><div style="display: flex; justify-content: space-between; margin-bottom: 10px;"><h4 style="margin: 0; color: #f59e0b;">Edit Details</h4><i class="fa fa-xmark" style="cursor: pointer; color: #94a3b8;" onclick="document.getElementById('edit-vendor-{{vendor[0]}}').style.display='none'"></i></div><form action="/admin/edit_vendor/{{ vendor[0] }}" method="POST" style="display: flex; flex-direction: column; gap: 8px;"><div style="display: flex; gap: 5px;"><input type="text" name="opening_time" value="{{ vendor[5] }}" required style="flex: 1; padding: 8px; border-radius: 4px; background: #1e293b; color: white; border: 1px solid #334155;"><input type="text" name="closing_time" value="{{ vendor[6] }}" required style="flex: 1; padding: 8px; border-radius: 4px; background: #1e293b; color: white; border: 1px solid #334155;"></div><input type="text" name="location" value="{{ vendor[9] }}" required style="padding: 8px; border-radius: 4px; background: #1e293b; color: white; border: 1px solid #334155;"><button type="submit" style="background: #f59e0b; color: black; padding: 8px; font-weight: bold; border-radius: 4px; border: none; cursor: pointer;">Save</button></form></div>
-                <hr style="border-color: #334155; margin: 20px 0;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                    <h2 style="margin:0; font-size: 28px; color:white;">{{ vendor[1] }}</h2>
+                    <span style="font-size: 14px; padding: 6px 15px; border-radius: 20px; background: {{ 'rgba(16,185,129,0.2)' if vendor[2] == 'Open' else 'rgba(239,68,68,0.2)' }}; color: {{ '#10b981' if vendor[2] == 'Open' else '#fca5a5' }}; font-weight:bold; text-transform: uppercase; letter-spacing: 1px;">
+                        {{ vendor[2] }}
+                    </span>
+                </div>
                 
-                <h4 style="margin-bottom: 10px; color: #38bdf8;">Menu Items</h4>
-                <div style="background: #0f172a; padding: 10px; border-radius: 5px; margin-bottom: 15px; max-height: 200px; overflow-y: auto;">
-                    {% for item in menu_items %} {% if item[1] == vendor[1] %}
-                    <div style="background: #1e293b; padding: 10px; border-radius: 5px; margin-bottom: 8px;"><div style="display: flex; justify-content: space-between;"><span>{{ item[2] }} (₹{{ item[3] }})</span><span style="font-size: 12px; color: {{ '#10b981' if item[5] == 'Available' else '#ef4444' }};">{{ item[5] }}</span></div>
-                    <div style="display: flex; gap: 5px; margin-top: 8px;"><form action="/admin/toggle_food/{{ item[0] }}" method="POST" style="flex: 1;"><button type="submit" style="width: 100%; padding: 4px; font-size: 11px; background: #475569;">Toggle</button></form><form action="/admin/delete_food/{{ item[0] }}" method="POST" style="flex: 1;"><button type="submit" style="width: 100%; padding: 4px; font-size: 11px; background: #7f1d1d;">Del</button></form></div></div>
-                    {% endif %} {% endfor %}
+                <div class="grid-2-col" style="margin-bottom: 30px;">
+                    <form action="/admin/toggle_vendor/{{ vendor[0] }}" method="POST">
+                        <button type="submit" style="width: 100%; padding: 15px;" class="action-btn {{ 'btn-red' if vendor[2] == 'Open' else 'btn-green' }}">
+                            {{ 'Close Shop' if vendor[2] == 'Open' else 'Open Shop' }}
+                        </button>
+                    </form>
+                    <form action="/admin/delete_vendor/{{ vendor[0] }}" method="POST" onsubmit="return confirm('Delete vendor permanently?');">
+                        <button type="submit" style="width: 100%; padding: 15px;" class="action-btn" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);">
+                            <i class="fa fa-trash"></i> Delete
+                        </button>
+                    </form>
+                </div>
+
+                <hr style="border-color: rgba(255,255,255,0.1); margin: 30px 0;">
+                
+                <h3 style="margin-top:0; margin-bottom: 20px; font-size: 20px; color: #38bdf8;">Manage Menu Items</h3>
+                <div class="vendor-menu-container">
+                    {% for item in menu_items %}
+                        {% if item[1] == vendor[1] %}
+                        <div class="menu-item-row">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                <strong style="font-size: 18px; color: white;">
+                                    <i class="fa {{ item[4] }}" style="color: #94a3b8;"></i> {{ item[2] }} 
+                                    <span style="color: #10b981;">(₹{{ item[3] }})</span>
+                                </strong>
+                                <span style="font-size: 12px; font-weight: bold; color: {{ '#10b981' if item[5] == 'Available' else '#ef4444' }}; text-transform: uppercase;">
+                                    {{ item[5] }}
+                                </span>
+                            </div>
+                            <div class="grid-2-col" style="margin-bottom: 15px;">
+                                <form action="/admin/toggle_food/{{ item[0] }}" method="POST">
+                                    <button type="submit" style="width: 100%;" class="action-btn" style="background: rgba(255,255,255,0.1);">Toggle Stock</button>
+                                </form>
+                                <form action="/admin/delete_food/{{ item[0] }}" method="POST">
+                                    <button type="submit" style="width: 100%;" class="action-btn" style="background: rgba(239,68,68,0.2); color: #fca5a5;">
+                                        <i class="fa fa-trash"></i> Drop
+                                    </button>
+                                </form>
+                            </div>
+                            <form action="/admin/edit_food_price/{{ item[0] }}" method="POST" style="display: flex; gap: 10px;">
+                                <input type="number" name="new_price" placeholder="New ₹" required class="clean-input" style="margin:0; flex: 1;">
+                                <button type="submit" style="flex: 2;" class="action-btn btn-yellow">Update Price</button>
+                            </form>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+                <div style="background: rgba(15, 23, 42, 0.6); padding: 25px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.05);">
+                    <h4 style="color: #38bdf8; margin-top: 0; margin-bottom: 20px; font-size: 18px;"><i class="fa fa-plus-circle"></i> Add New Item</h4>
+                    <form action="/admin/add_food" method="POST">
+                        <input type="hidden" name="vendor_name" value="{{ vendor[1] }}">
+                        <input class="clean-input" type="text" name="item_name" placeholder="Item Name" required>
+                        <div class="grid-2-col">
+                            <input class="clean-input" type="number" name="price" placeholder="Price (₹)" required>
+                            <select class="clean-input" name="diet">
+                                <option value="Veg">Veg</option>
+                                <option value="Non-Veg">Non-Veg</option>
+                            </select>
+                        </div>
+                        <div class="grid-2-col">
+                            <select class="clean-input" name="category">
+                                <option value="Main Course">Main Course</option>
+                                <option value="Beverage">Beverage</option>
+                                <option value="Snack">Snack</option>
+                            </select>
+                            <input class="clean-input" type="text" name="icon" placeholder="Icon code (e.g., fa-pizza-slice)">
+                        </div>
+                        <input class="clean-input" type="text" name="description" placeholder="Brief description">
+                        <label style="font-size: 14px; color: #cbd5e1; display: flex; align-items: center; gap: 10px; margin-bottom: 20px; cursor: pointer; font-weight: bold;">
+                            <input type="checkbox" name="is_customizable" value="Yes" onchange="this.parentElement.nextElementSibling.style.display = this.checked ? 'block' : 'none'" style="width: 20px; height: 20px; accent-color: #38bdf8;"> 
+                            Enable Sizes & Add-ons
+                        </label>
+                        <div style="display: none; background: rgba(30, 41, 59, 0.8); padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 1px dashed rgba(255,255,255,0.2);">
+                            <input class="clean-input" type="number" name="half_price" placeholder="Half Portion Price (Optional)">
+                            <input class="clean-input" type="text" name="addons" placeholder="Add-ons (e.g., Extra Cheese, Mayo)">
+                        </div>
+                        <button type="submit" class="action-btn btn-blue" style="width: 100%; padding: 15px; font-size: 16px;">
+                            <i class="fa fa-upload"></i> Publish to Menu
+                        </button>
+                    </form>
                 </div>
             </div>
             {% endfor %}
         </div>
+
+        <h2 class="section-title" style="margin-top: 60px;"><i class="fa fa-clock-rotate-left"></i> Campus Order History</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Date/Time</th>
+                    <th>Student</th>
+                    <th>Vendor</th>
+                    <th>Item(s)</th>
+                    <th>Revenue</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in history %}
+                <tr>
+                    <td style="color: #94a3b8; font-weight: bold;">#{{ log[0] }}</td>
+                    <td style="color: #cbd5e1;">{{ log[6] }}</td>
+                    <td style="color: white; font-weight: bold;">{{ log[1] }}</td>
+                    <td style="color: #38bdf8; font-weight: bold;">{{ log[2] }}</td>
+                    <td>{{ log[3] }} (x{{ log[4] }})</td>
+                    <td style="color: #10b981; font-weight: bold; font-size: 18px;">₹{{ log[5] }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" style="text-align: center; color: #94a3b8; padding: 30px; font-size: 16px;">No completed orders yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 
     <div id="students-tab" class="tab-content">
-        <h3><i class="fa fa-user-graduate"></i> Manage Student Accounts</h3>
-        <div class="food-grid">
-            {% for student in students %}
-            <div style="background: #1e293b; padding: 20px; border-radius: 8px; border-left: 5px solid {{ '#10b981' if student[4] == 'Active' else '#ef4444' }};">
-                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #334155; padding-bottom: 10px; margin-bottom: 15px;"><h3 style="margin: 0; color: #38bdf8;"><i class="fa fa-user"></i> {{ student[1] }}</h3><span style="font-size: 12px; font-weight: bold; background: {{ '#064e3b' if student[4] == 'Active' else '#7f1d1d' }}; color: {{ '#10b981' if student[4] == 'Active' else '#fca5a5' }}; padding: 4px 8px; border-radius: 4px;">{{ student[4] }}</span></div>
-                <div style="display: flex; gap: 10px;">
-                    <form action="/admin/toggle_student/{{ student[0] }}" method="POST" style="flex: 1;"><button type="submit" style="width: 100%; padding: 8px; border-radius: 5px; border: none; cursor: pointer; font-weight: bold; background: {{ '#ef4444' if student[4] == 'Active' else '#10b981' }}; color: white;"><i class="fa {{ 'fa-ban' if student[4] == 'Active' else 'fa-unlock' }}"></i> {{ 'Block' if student[4] == 'Active' else 'Unblock' }}</button></form>
-                    <form action="/admin/delete_student/{{ student[0] }}" method="POST" style="flex: 1;" onsubmit="return confirm('Delete permanently?');"><button type="submit" style="width: 100%; padding: 8px; border-radius: 5px; border: none; cursor: pointer; background: #475569; color: white;"><i class="fa fa-trash"></i> Delete</button></form>
+        <div class="admin-section-box">
+            <h2 class="section-title"><i class="fa fa-user-plus"></i> Register New Student</h2>
+            <form action="/admin/add_student" method="POST" class="grid-3-col">
+                <input class="clean-input" type="text" name="username" placeholder="Student Username" required style="margin:0;">
+                <input class="clean-input" type="text" name="password" placeholder="Account Password" required style="margin:0;">
+                <button type="submit" class="action-btn btn-blue" style="padding: 15px;">
+                    <i class="fa fa-user-check"></i> Create Account
+                </button>
+            </form>
+        </div>
+
+        <h2 class="section-title" style="margin-top: 50px;"><i class="fa fa-users"></i> Student Directory</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>System ID</th>
+                    <th>Username</th>
+                    <th>Password</th>
+                    <th>Role</th>
+                    <th style="text-align: center;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                <tr>
+                    <td style="color: #94a3b8; font-weight:bold;">#{{ student[0] }}</td>
+                    <td style="color: white; font-weight:bold; font-size: 18px;">{{ student[1] }}</td>
+                    <td style="font-family: monospace; font-size: 16px; letter-spacing: 2px; color: #cbd5e1;">{{ student[2] }}</td>
+                    <td>
+                        <span style="background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.5); padding:6px 12px; border-radius:20px; font-size:12px; font-weight:bold; letter-spacing: 1px; text-transform: uppercase;">
+                            {{ student[3] }}
+                        </span>
+                    </td>
+                    <td style="text-align: center; display: flex; justify-content: center; gap: 10px;">
+                        <button onclick="openEditStudentModal({{ student[0] }}, '{{ student[1] }}', '{{ student[2] }}')" class="action-btn btn-yellow">
+                            <i class="fa fa-pen"></i> Edit
+                        </button>
+                        <form action="/admin/delete_student/{{ student[0] }}" method="POST" onsubmit="return confirm('Delete student?');">
+                            <button type="submit" class="action-btn btn-red">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <div id="rooms-tab" class="tab-content">
+        <h2 class="section-title"><i class="fa fa-inbox"></i> Room Requests Inbox</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Room</th>
+                    <th>Date & Time</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for req in room_requests %}
+                <tr>
+                    <td style="color: white; font-weight: bold;">{{ req[2] }}</td>
+                    <td style="color: #38bdf8; font-weight: bold; font-size: 18px;">{{ req[1] }}</td>
+                    <td style="color: #cbd5e1;">{{ req[3] }} <br> <span style="font-size:13px; color: #94a3b8;">{{ req[4] }}</span></td>
+                    <td>
+                        <span style="padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; background: {{ 'rgba(245,158,11,0.2)' if req[5] == 'Pending' else ('rgba(16,185,129,0.2)' if req[5] == 'Approved' else 'rgba(239,68,68,0.2)') }}; color: {{ '#f59e0b' if req[5] == 'Pending' else ('#10b981' if req[5] == 'Approved' else '#ef4444') }}; border: 1px solid {{ 'rgba(245,158,11,0.5)' if req[5] == 'Pending' else ('rgba(16,185,129,0.5)' if req[5] == 'Approved' else 'rgba(239,68,68,0.5)') }}; text-transform: uppercase; letter-spacing: 1px;">
+                            {{ req[5] }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if req[5] == 'Pending' %}
+                        <form action="/admin/room_action" method="POST" style="display:inline;">
+                            <input type="hidden" name="request_id" value="{{ req[0] }}">
+                            <input type="hidden" name="action" value="approve">
+                            <button type="submit" class="action-btn btn-green"><i class="fa fa-check"></i> Approve</button>
+                        </form>
+                        <form action="/admin/room_action" method="POST" style="display:inline; margin-left: 5px;">
+                            <input type="hidden" name="request_id" value="{{ req[0] }}">
+                            <input type="hidden" name="action" value="reject">
+                            <button type="submit" class="action-btn btn-red"><i class="fa fa-xmark"></i> Reject</button>
+                        </form>
+                        {% else %}
+                        <span style="color: #64748b; font-weight: bold; font-size: 14px;"><i class="fa fa-check-double"></i> Processed</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" style="text-align: center; color: #94a3b8; padding: 30px;">Inbox is empty.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="admin-section-box" style="margin-top: 60px;">
+            <h2 class="section-title"><i class="fa fa-plus-square"></i> Add New Room</h2>
+            <form action="/admin/add_room" method="POST" class="grid-3-col">
+                <input class="clean-input" type="text" name="room_name" placeholder="Room ID (e.g. NLH101)" required style="margin:0;">
+                <select class="clean-input" name="room_type" required style="margin:0;">
+                    <option value="Lecture Hall">Lecture Hall</option>
+                    <option value="Tutorial room">Tutorial Room</option>
+                    <option value="Classroom">Classroom</option>
+                </select>
+                <button type="submit" class="action-btn btn-blue" style="padding: 15px;">
+                    <i class="fa fa-save"></i> Save to System
+                </button>
+            </form>
+        </div>
+
+        <h2 class="section-title" style="margin-top: 50px;"><i class="fa fa-building"></i> Manage Campus Rooms</h2>
+        <div class="grid-3-col">
+            {% for room in rooms %}
+            <div class="admin-section-box" style="margin-bottom: 0; border-top: 5px solid #38bdf8; padding: 30px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3 style="margin: 0; font-size: 24px; color: white;"><i class="fa fa-door-open" style="color: #94a3b8;"></i> {{ room[1] }}</h3>
+                    <form action="/admin/delete_room/{{ room[0] }}" method="POST" onsubmit="return confirm('Delete room?');">
+                        <button type="submit" class="action-btn" style="background: rgba(239,68,68,0.2); color: #fca5a5; border: 1px solid rgba(239,68,68,0.5);">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </form>
                 </div>
+                <p style="margin: 0 0 25px 0; font-size: 15px; color: #94a3b8;">Type Designation: <strong style="color: #38bdf8;">{{ room[2] }}</strong></p>
+                <form action="/admin/edit_room/{{ room[0] }}" method="POST" style="display: flex; flex-direction: column; gap: 15px;">
+                    <input class="clean-input" type="text" name="new_name" value="{{ room[1] }}" required style="margin:0;">
+                    <select class="clean-input" name="new_type" required style="margin:0;">
+                        <option value="Lecture Hall" {% if room[2] == 'Lecture Hall' %}selected{% endif %}>Lecture Hall</option>
+                        <option value="Tutorial room" {% if room[2] == 'Tutorial room' %}selected{% endif %}>Tutorial Room</option>
+                        <option value="Classroom" {% if room[2] == 'Classroom' %}selected{% endif %}>Classroom</option>
+                    </select>
+                    <button type="submit" class="action-btn btn-green" style="width: 100%; padding: 15px;">
+                        <i class="fa fa-arrows-rotate"></i> Update Room
+                    </button>
+                </form>
             </div>
             {% endfor %}
         </div>
     </div>
-    
-    <div id="rooms-tab" class="tab-content">
-        <p style="color: #94a3b8; margin-bottom: 20px;">Click a room or seat to manually toggle its availability.</p>
-        
-        <h3>Group Discussion Rooms</h3>
-        <div class="food-grid" style="margin-bottom: 30px;">
-            {% for room in rooms %}
-            <form action="/admin/toggle_room/{{ room[0] }}" method="POST">
-                <button type="submit" style="width: 100%; background: #1e293b; padding: 15px; border-radius: 8px; border: none; border-top: 4px solid {{ '#10b981' if room[2] == 'Available' else '#ef4444' }}; color: white; cursor: pointer; text-align: left;">
-                    <h4><i class="fa fa-door-open"></i> {{ room[1] }}</h4>
-                    <p style="margin: 0; color: {{ '#10b981' if room[2] == 'Available' else '#ef4444' }}">{{ room[2] }}</p>
+
+    <div id="seats-tab" class="tab-content">
+        <h2 class="section-title"><i class="fa fa-chair"></i> Library Seat Inbox</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Library Location</th>
+                    <th>Desk No.</th>
+                    <th>Date & Time</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for req in library_requests %}
+                <tr>
+                    <td style="font-weight: bold; color: white; font-size: 16px;">{{req[3]}}</td>
+                    <td style="font-size: 15px; color: #cbd5e1;">{{req[1]}}</td>
+                    <td><strong style="color:#38bdf8; font-size: 22px;">#{{req[2]}}</strong></td>
+                    <td style="color: #cbd5e1;">{{req[4]}}<br><span style="color:#94a3b8; font-size: 13px;">{{req[5]}}</span></td>
+                    <td>
+                        {% if req[6] == 'Pending' %}
+                        <form action="/admin/library_action" method="POST" style="display:inline;">
+                            <input type="hidden" name="request_id" value="{{req[0]}}">
+                            <button name="action" value="approve" class="action-btn btn-green"><i class="fa fa-check"></i> Approve</button>
+                            <button name="action" value="reject" class="action-btn btn-red" style="margin-left: 10px;"><i class="fa fa-xmark"></i></button>
+                        </form>
+                        {% else %}
+                        <span style="color: #64748b; font-weight: bold; font-size: 14px;"><i class="fa fa-check-double"></i> Processed</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" style="text-align: center; color: #94a3b8; padding: 30px;">Inbox is empty.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="admin-section-box" style="margin-top: 60px;">
+            <h2 class="section-title"><i class="fa fa-plus-square"></i> Add New Desk to Blueprint</h2>
+            <form action="/admin/add_seat" method="POST" class="grid-3-col">
+                <input class="clean-input" type="text" name="seat_no" placeholder="Desk ID (e.g. 42)" required style="margin:0;">
+                <select class="clean-input" name="location" required style="margin:0;">
+                    <option value="A block library">A Block Library</option>
+                    <option value="Hatchery">Hatchery</option>
+                    <option value="LRC">LRC</option>
+                    <option value="Law library">Law Library</option>
+                </select>
+                <select class="clean-input" name="status" required style="margin:0;">
+                    <option value="Available">Available</option>
+                    <option value="Maintenance">Maintenance</option>
+                </select>
+                <button type="submit" class="action-btn btn-blue" style="grid-column: 1 / -1; padding: 15px;">
+                    <i class="fa fa-map"></i> Publish to Map
                 </button>
             </form>
-            {% endfor %}
         </div>
 
-        <h3>Library Seats</h3>
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px;">
+        <h2 class="section-title" style="margin-top: 50px;"><i class="fa fa-map-location-dot"></i> Manage Blueprint Desks</h2>
+        <div class="grid-3-col">
             {% for seat in seats %}
-            <form action="/admin/toggle_seat/{{ seat[0] }}" method="POST">
-                <button type="submit" style="width: 100%; background: #1e293b; padding: 15px 5px; border-radius: 8px; border: none; border-top: 4px solid {{ '#10b981' if seat[2] == 'Available' else '#ef4444' }}; color: white; cursor: pointer; text-align: center;">
-                    <i class="fa fa-chair"></i><br>{{ seat[1] }}<br>
-                    <small style="color: {{ '#10b981' if seat[2] == 'Available' else '#ef4444' }}">{{ seat[2] }}</small>
-                </button>
-            </form>
+            <div class="admin-section-box" style="margin-bottom: 0; padding: 30px; border-top: 5px solid {{ '#10b981' if seat[2] == 'Available' else '#ef4444' }};">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3 style="margin: 0; font-size: 24px; color: white;"><i class="fa fa-desktop" style="color: #94a3b8;"></i> Desk {{ seat[1] }}</h3>
+                    <form action="/admin/delete_seat/{{ seat[0] }}" method="POST" onsubmit="return confirm('Delete this desk?');">
+                        <button type="submit" class="action-btn" style="background: rgba(239,68,68,0.2); color: #fca5a5; border: 1px solid rgba(239,68,68,0.5);">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </form>
+                </div>
+                
+                <form action="/admin/edit_seat/{{ seat[0] }}" method="POST" style="display: flex; flex-direction: column; gap: 15px;">
+                    <input class="clean-input" type="text" name="new_seat_no" value="{{ seat[1] }}" required style="margin:0;">
+                    <select class="clean-input" name="new_location" required style="margin:0;">
+                        <option value="A block library" {% if seat[3] == 'A block library' %}selected{% endif %}>A Block</option>
+                        <option value="Hatchery" {% if seat[3] == 'Hatchery' %}selected{% endif %}>Hatchery</option>
+                        <option value="LRC" {% if seat[3] == 'LRC' %}selected{% endif %}>LRC</option>
+                        <option value="Law library" {% if seat[3] == 'Law library' %}selected{% endif %}>Law Library</option>
+                    </select>
+                    <select class="clean-input" name="new_status" required style="margin:0;">
+                        <option value="Available" {% if seat[2] == 'Available' %}selected{% endif %}>Available</option>
+                        <option value="Maintenance" {% if seat[2] == 'Maintenance' %}selected{% endif %}>Maintenance</option>
+                    </select>
+                    <button type="submit" class="action-btn btn-green" style="width: 100%; padding: 15px;">
+                        <i class="fa fa-arrows-rotate"></i> Update Desk
+                    </button>
+                </form>
+            </div>
             {% endfor %}
         </div>
     </div>
 
     <div id="events-tab" class="tab-content">
-        
-        <div style="background: #1e293b; padding: 20px; border-radius: 8px; margin-bottom: 30px;">
-            <h3><i class="fa fa-bullhorn"></i> Post a Campus Event</h3>
-            <form action="/admin/add_event" method="POST" style="display: flex; flex-direction: column; gap: 10px; margin-top: 15px;">
-                <div style="display: flex; gap: 10px;">
-                    <input type="text" name="title" placeholder="Event Title (e.g. Hackathon 2026)" required style="flex: 2; padding: 10px; border-radius: 5px; background: #0f172a; color: white; border: 1px solid #334155;">
-                    <input type="text" name="date" placeholder="Date (e.g. Oct 15, 2026)" required style="flex: 1; padding: 10px; border-radius: 5px; background: #0f172a; color: white; border: 1px solid #334155;">
+        <div class="admin-section-box" style="border-left: 6px solid #f59e0b; padding: 40px;">
+            <h2 class="section-title" style="color: #f59e0b; border-bottom-color: rgba(245, 158, 11, 0.2);">
+                <i class="fa fa-bullhorn"></i> Host Official Campus Event
+            </h2>
+            <form action="/admin/add_event" method="POST">
+                <div class="grid-2-col">
+                    <div>
+                        <label style="color: #cbd5e1; font-weight: bold; margin-bottom: 8px; display: block; font-size: 13px; text-transform: uppercase;">Event Title</label>
+                        <input class="clean-input" type="text" name="title" required>
+                    </div>
+                    <div>
+                        <label style="color: #cbd5e1; font-weight: bold; margin-bottom: 8px; display: block; font-size: 13px; text-transform: uppercase;">Organizer</label>
+                        <input class="clean-input" type="text" name="organizer" required>
+                    </div>
+                    <div>
+                        <label style="color: #cbd5e1; font-weight: bold; margin-bottom: 8px; display: block; font-size: 13px; text-transform: uppercase;">Date</label>
+                        <input class="clean-input" type="date" name="date" required color-scheme="dark">
+                    </div>
+                    <div>
+                        <label style="color: #cbd5e1; font-weight: bold; margin-bottom: 8px; display: block; font-size: 13px; text-transform: uppercase;">Time</label>
+                        <input class="clean-input" type="text" name="time" placeholder="e.g. 05:00 PM" required>
+                    </div>
+                    <div>
+                        <label style="color: #cbd5e1; font-weight: bold; margin-bottom: 8px; display: block; font-size: 13px; text-transform: uppercase;">Location</label>
+                        <input class="clean-input" type="text" name="location" required>
+                    </div>
+                    <div>
+                        <label style="color: #cbd5e1; font-weight: bold; margin-bottom: 8px; display: block; font-size: 13px; text-transform: uppercase;">Category</label>
+                        <select class="clean-input" name="category" required>
+                            <option value="General">General</option>
+                            <option value="Tech & Hackathons">Tech & Hackathons</option>
+                            <option value="Entertainment">Entertainment</option>
+                            <option value="Career & Expos">Career & Expos</option>
+                        </select>
+                    </div>
                 </div>
-                <textarea name="description" placeholder="Event details..." required style="padding: 10px; border-radius: 5px; background: #0f172a; color: white; border: 1px solid #334155; height: 80px;"></textarea>
-                <button type="submit" style="background: #38bdf8; color: black; font-weight: bold; padding: 10px; border-radius: 5px; border: none; cursor: pointer; width: 150px;">Post Event</button>
+                
+                <label style="color: #cbd5e1; font-weight: bold; margin-bottom: 8px; display: block; font-size: 13px; text-transform: uppercase;">External Link</label>
+                <input class="clean-input" type="url" name="reg_link" placeholder="Optional RSVP link">
+                
+                <label style="color: #cbd5e1; font-weight: bold; margin-bottom: 8px; display: block; font-size: 13px; text-transform: uppercase;">Description</label>
+                <textarea class="clean-input" name="desc" placeholder="Write a compelling description..." rows="5" required style="resize: vertical; margin-bottom: 25px;"></textarea>
+                
+                <button type="submit" class="action-btn btn-yellow" style="width: 100%; font-size: 18px; padding: 20px; box-shadow: 0 10px 30px rgba(245, 158, 11, 0.3);">
+                    <i class="fa fa-rocket"></i> Publish Event Live
+                </button>
             </form>
         </div>
 
-        <h3>Active Events</h3>
-        <div class="food-grid">
-            {% for event in events %}
-            <div style="background: #1e293b; padding: 15px; border-radius: 8px; border-left: 4px solid #38bdf8; position: relative;">
-                <h4 style="color: #38bdf8; margin-top: 0;">{{ event[1] }}</h4>
-                <p style="font-size: 12px; color: #94a3b8;"><i class="fa fa-calendar"></i> {{ event[3] }}</p>
-                <p style="font-size: 14px;">{{ event[2] }}</p>
-                <form action="/admin/delete_event/{{ event[0] }}" method="POST" style="position: absolute; top: 15px; right: 15px;">
-                    <button type="submit" style="background: #7f1d1d; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">Delete</button>
-                </form>
-            </div>
-            {% else %}
-            <p style="color: #94a3b8;">No events posted.</p>
-            {% endfor %}
-        </div>
+        <h2 class="section-title" style="margin-top: 60px;"><i class="fa fa-list-check"></i> Event Approvals & Directory</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Event Details</th>
+                    <th>Category & Org</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ev in events %}
+                <tr>
+                    <td>
+                        <strong style="color: white; font-size: 20px; display: block; margin-bottom: 8px;">{{ ev[1] }}</strong>
+                        <span style="font-size: 14px; color: #38bdf8;">
+                            <i class="fa fa-calendar"></i> {{ ev[3] }} @ {{ ev[4] }} <span style="color: #64748b; margin: 0 10px;">|</span> <i class="fa fa-location-dot"></i> {{ ev[5] }}
+                        </span>
+                    </td>
+                    <td>
+                        <span style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; color: white; letter-spacing: 1px; text-transform: uppercase;">
+                            {{ ev[6] }}
+                        </span><br>
+                        <span style="font-size: 14px; color: #cbd5e1; display: block; margin-top: 10px;">
+                            <i class="fa fa-users" style="color: #94a3b8;"></i> {{ ev[7] }}
+                        </span>
+                    </td>
+                    <td>
+                        <span style="padding: 6px 12px; border-radius: 8px; font-size: 13px; font-weight: bold; background: {{ 'rgba(245,158,11,0.2)' if ev[8] == 'Pending' else ('rgba(16,185,129,0.2)' if ev[8] == 'Approved' else 'rgba(239,68,68,0.2)') }}; border: 1px solid {{ 'rgba(245,158,11,0.5)' if ev[8] == 'Pending' else ('rgba(16,185,129,0.5)' if ev[8] == 'Approved' else 'rgba(239,68,68,0.5)') }}; color: {{ '#f59e0b' if ev[8] == 'Pending' else ('#10b981' if ev[8] == 'Approved' else '#fca5a5') }}; text-transform: uppercase; letter-spacing: 1px;">
+                            {{ ev[8] }}
+                        </span>
+                    </td>
+                    <td>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            {% if ev[8] == 'Pending' %}
+                            <form action="/admin/event_action" method="POST">
+                                <input type="hidden" name="request_id" value="{{ ev[0] }}">
+                                <input type="hidden" name="action" value="approve">
+                                <button type="submit" class="action-btn btn-green" title="Approve"><i class="fa fa-check"></i></button>
+                            </form>
+                            <form action="/admin/event_action" method="POST">
+                                <input type="hidden" name="request_id" value="{{ ev[0] }}">
+                                <input type="hidden" name="action" value="reject">
+                                <button type="submit" class="action-btn btn-red" title="Reject"><i class="fa fa-xmark"></i></button>
+                            </form>
+                            {% endif %}
+                            <button onclick="openEditEventModal({{ ev[0] }}, '{{ ev[1]|escape }}', '{{ ev[2]|escape }}', '{{ ev[3] }}', '{{ ev[4] }}', '{{ ev[5]|escape }}', '{{ ev[6] }}', '{{ ev[7]|escape }}', '{{ ev[9]|default('', true)|escape }}')" class="action-btn btn-yellow" title="Edit">
+                                <i class="fa fa-pen"></i>
+                            </button>
+                            <form action="/admin/delete_event/{{ ev[0] }}" method="POST" onsubmit="return confirm('Permanently delete event?');">
+                                <button type="submit" class="action-btn" style="background: rgba(239,68,68,0.2); color: #fca5a5; border: 1px solid rgba(239,68,68,0.5);" title="Delete">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" style="text-align: center; color: #94a3b8; padding: 30px;">No events exist.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
+</div>
 
+<div id="editStudentModal" class="custom-modal">
+    <div class="custom-box">
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px; margin-bottom: 25px;">
+            <h2 style="margin: 0; color: #38bdf8; font-size: 26px;"><i class="fa fa-user-pen"></i> Edit Student</h2>
+            <i class="fa fa-xmark" style="cursor: pointer; font-size: 26px; color: #94a3b8; transition: 0.2s;" onclick="closeEditStudentModal()" onmouseover="this.style.color='white'" onmouseout="this.style.color='#94a3b8'"></i>
+        </div>
+        <form id="editStudentForm" method="POST">
+            <label style="color:#cbd5e1; font-size:14px; margin-bottom:8px; display:block; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Student Username</label>
+            <input class="clean-input" type="text" id="edit-student-username" name="username" required>
+            
+            <label style="color:#cbd5e1; font-size:14px; margin-bottom:8px; display:block; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Account Password</label>
+            <input class="clean-input" type="text" id="edit-student-password" name="password" required style="font-family:monospace; margin-bottom: 30px;">
+            
+            <button type="submit" class="action-btn btn-yellow" style="width:100%; padding:20px; font-size:16px;">
+                <i class="fa fa-save"></i> Save Changes
+            </button>
+        </form>
+    </div>
+</div>
+
+<div id="editEventModal" class="custom-modal">
+    <div class="custom-box" style="max-width: 800px; max-height: 90vh; overflow-y: auto;">
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px; margin-bottom: 30px;">
+            <h2 style="margin: 0; color: #f59e0b; font-size: 28px;"><i class="fa fa-pen-to-square"></i> Edit Event Data</h2>
+            <i class="fa fa-xmark" style="cursor: pointer; font-size: 28px; color: #94a3b8; transition: 0.2s;" onclick="closeEditEventModal()" onmouseover="this.style.color='white'" onmouseout="this.style.color='#94a3b8'"></i>
+        </div>
+        <form id="editEventForm" method="POST">
+            <div class="grid-2-col">
+                <div>
+                    <label style="color:#cbd5e1; font-size:13px; font-weight: bold; display:block; margin-bottom: 8px;">Event Title</label>
+                    <input class="clean-input" type="text" id="edit-ev-title" name="title" required>
+                </div>
+                <div>
+                    <label style="color:#cbd5e1; font-size:13px; font-weight: bold; display:block; margin-bottom: 8px;">Organizer</label>
+                    <input class="clean-input" type="text" id="edit-ev-org" name="organizer" required>
+                </div>
+                <div>
+                    <label style="color:#cbd5e1; font-size:13px; font-weight: bold; display:block; margin-bottom: 8px;">Date</label>
+                    <input class="clean-input" type="date" id="edit-ev-date" name="date" required color-scheme="dark">
+                </div>
+                <div>
+                    <label style="color:#cbd5e1; font-size:13px; font-weight: bold; display:block; margin-bottom: 8px;">Time</label>
+                    <input class="clean-input" type="text" id="edit-ev-time" name="time" required>
+                </div>
+                <div>
+                    <label style="color:#cbd5e1; font-size:13px; font-weight: bold; display:block; margin-bottom: 8px;">Location</label>
+                    <input class="clean-input" type="text" id="edit-ev-loc" name="location" required>
+                </div>
+                <div>
+                    <label style="color:#cbd5e1; font-size:13px; font-weight: bold; display:block; margin-bottom: 8px;">Category</label>
+                    <select class="clean-input" id="edit-ev-cat" name="category" required>
+                        <option value="General">General</option>
+                        <option value="Tech & Hackathons">Tech & Hackathons</option>
+                        <option value="Entertainment">Entertainment</option>
+                        <option value="Career & Expos">Career & Expos</option>
+                    </select>
+                </div>
+            </div>
+            <label style="color:#cbd5e1; font-size:13px; font-weight: bold; display:block; margin-bottom: 8px;">Registration Link</label>
+            <input class="clean-input" type="url" id="edit-ev-link" name="reg_link">
+            
+            <label style="color:#cbd5e1; font-size:13px; font-weight: bold; display:block; margin-bottom: 8px;">Description</label>
+            <textarea class="clean-input" id="edit-ev-desc" name="desc" rows="6" required style="resize: vertical; margin-bottom: 30px;"></textarea>
+            
+            <button type="submit" class="action-btn btn-yellow" style="width:100%; padding:20px; font-size:18px; box-shadow: 0 10px 30px rgba(245, 158, 11, 0.3);">
+                <i class="fa fa-save"></i> Update Event Record
+            </button>
+        </form>
+    </div>
 </div>
 
 <script>
+    // Keep your existing tab and modal functions intact
     function showTab(id, btn) {
         document.querySelectorAll(".tab-content").forEach(t => t.classList.remove("active"));
         document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
         document.getElementById(id).classList.add("active");
         btn.classList.add("active");
+
+        let cartBtn = document.querySelector('.floating-cart');
+        if (cartBtn) {
+            cartBtn.style.transform = id === 'food' ? "scale(1)" : "scale(0)";
+            cartBtn.style.opacity = id === 'food' ? "1" : "0";
+            cartBtn.style.pointerEvents = id === 'food' ? "all" : "none";
+        }
     }
+
+    function openEditStudentModal(id, username, password) {
+        document.getElementById('edit-student-username').value = username; 
+        document.getElementById('edit-student-password').value = password;
+        document.getElementById('editStudentForm').action = '/admin/edit_student/' + id; 
+        document.getElementById('editStudentModal').style.display = 'flex';
+    }
+    function closeEditStudentModal() { document.getElementById('editStudentModal').style.display = 'none'; }
+
+    function openEditEventModal(id, title, desc, date, time, loc, cat, org, link) {
+        document.getElementById('edit-ev-title').value = title; document.getElementById('edit-ev-desc').value = desc; document.getElementById('edit-ev-date').value = date;
+        document.getElementById('edit-ev-time').value = time; document.getElementById('edit-ev-loc').value = loc; document.getElementById('edit-ev-cat').value = cat;
+        document.getElementById('edit-ev-org').value = org; document.getElementById('edit-ev-link').value = link;
+        document.getElementById('editEventForm').action = '/admin/edit_event/' + id; document.getElementById('editEventModal').style.display = 'flex';
+    }
+    function closeEditEventModal() { document.getElementById('editEventModal').style.display = 'none'; }
+
+    // =========================================================
+    // GLITCH-FREE ANIMATION ENGINE
+    // =========================================================
+    document.addEventListener("DOMContentLoaded", () => {
+        
+        // 1. Magnetic Glow (Untouched, works perfectly)
+        const applyMagneticEffect = () => {
+            document.querySelectorAll('.food-card, .event-card, .admin-section-box, table, .seat-blueprint').forEach(card => {
+                card.style.transition = 'background 0.3s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease';
+                card.addEventListener('mousemove', e => {
+                    const rect = card.getBoundingClientRect(); 
+                    const x = e.clientX - rect.left; 
+                    const y = e.clientY - rect.top;
+                    card.style.background = `radial-gradient(circle 500px at ${x}px ${y}px, rgba(56, 189, 248, 0.15), rgba(30, 41, 59, 0.4) 70%)`;
+                });
+                card.addEventListener('mouseleave', () => { card.style.background = `rgba(30, 41, 59, 0.4)`; });
+            });
+        };
+        applyMagneticEffect();
+
+        // 2. The Fixed 3D Wave Reveal
+        window.triggerAnimations = function() {
+            const activeTab = document.querySelector('.tab-content.active') || document.body;
+            const elements = activeTab.querySelectorAll('.food-card, .event-card, .admin-section-box, table, .section-title, h2, h3, .seat-blueprint');
+            
+            // Instantly apply the CSS hidden state to all elements
+            elements.forEach(el => {
+                el.classList.remove('is-visible');
+                el.classList.add('reveal-up');
+                el.style.transitionDelay = '0ms'; // Reset any old delays
+            });
+            
+            const observer = new IntersectionObserver((entries) => {
+                let delay = 0;
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        // Apply the stagger delay
+                        entry.target.style.transitionDelay = `${delay}ms`;
+                        
+                        // Add the visible class (CSS handles the smooth animation natively)
+                        entry.target.classList.add('is-visible');
+                        
+                        delay += 80; // Speed of the cascade
+                        
+                        // Never observe this element again so it can't double-bounce
+                        observer.unobserve(entry.target);
+                    }
+                });
+                
+                // Reset the delay batch after a tiny pause so the next scroll starts instantly
+                setTimeout(() => { delay = 0; }, 100);
+                
+            }, { threshold: 0.05, rootMargin: "0px 0px -20px 0px" });
+            
+            elements.forEach(el => observer.observe(el));
+        };
+
+        // Fire on load and hook into tab clicks
+        setTimeout(triggerAnimations, 100);
+        document.querySelectorAll('.tab-btn').forEach(btn => { 
+            btn.addEventListener('click', () => setTimeout(triggerAnimations, 50)); 
+        });
+        
+        // Failsafe execution for other dynamically loaded scripts (like Calendars/Cart)
+        if(typeof loadCart === "function") loadCart();
+        if(typeof renderCalendar === "function") renderCalendar();
+        if(typeof startTimers === "function") startTimers();
+        let dInput = document.getElementById('ev-date'); if(dInput) dInput.min = new Date().toISOString().split('T')[0];
+        let lInput = document.getElementById('libDate'); if(lInput) lInput.min = new Date().toISOString().split('T')[0];
+    });
 </script>
 </body>
 </html>
