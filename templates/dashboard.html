@@ -609,5 +609,24 @@
         });
     });
 </script>
+// --- SMART REFRESH FOR STUDENT DASHBOARD ---
+// Sync Cart data every 1 second (without reloading page)
+setInterval(function() {
+    if (typeof loadCart === "function") {
+        loadCart();
+    }
+}, 1000);
+
+// Refresh full page every 5 seconds for Order Status updates
+setInterval(function() {
+    const modalOpen = document.getElementById("customModal").style.display === "flex";
+    const paymentOpen = document.getElementById("paymentModal").style.display === "flex";
+    const isTyping = document.activeElement.tagName === 'INPUT';
+
+    // Only reload if user isn't busy customizing food or paying
+    if (!modalOpen && !paymentOpen && !isTyping) {
+        window.location.reload();
+    }
+}, 5000);
 </body>
 </html>

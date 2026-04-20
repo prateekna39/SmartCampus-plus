@@ -758,5 +758,14 @@
         let lInput = document.getElementById('libDate'); if(lInput) lInput.min = new Date().toISOString().split('T')[0];
     });
 </script>
+// --- ADMIN LIVE DATA REFRESH ---
+setInterval(function() {
+    const modalOpen = document.querySelector('.custom-modal[style*="display: flex"]');
+    const isTyping = document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA';
+
+    if (!modalOpen && !isTyping) {
+        window.location.reload();
+    }
+}, 30000);
 </body>
 </html>
