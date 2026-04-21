@@ -499,8 +499,25 @@
     function confirmCustomization() { let finalName = currentItem.name; let finalPrice = currentItem.price; if (currentItem.half_price > 0) { if (document.getElementById("c-half-radio").checked) { finalName += " (Half)"; finalPrice = parseInt(document.getElementById("c-half-radio").value); } else { finalName += " (Full)"; } } let sel = []; document.querySelectorAll(".c-addon-cb:checked").forEach(cb => { sel.push(cb.value); }); if (sel.length > 0) finalName += " [" + sel.join(", ") + "]"; addToCart(finalName, finalPrice, currentVendor); closeCustomModal(); }
     function backToVendors() { document.getElementById('menu-view').style.display = 'none'; document.getElementById('vendor-view').style.display = 'block'; if(window.triggerAnimations) setTimeout(triggerAnimations, 50);}
     
-    function addToCart(item, price, vendor_name) { fetch("/add_to_cart", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ item: item, price: price, vendor_name: vendor_name }) }).then(() => { showToast(); loadCart(); }); }
-    function loadCart() { fetch("/get_cart").then(res => res.json()).then(data => { let html = ""; let total = 0; data.forEach(d => { total += d[1] * d[2]; html += `<div class="cart-item"><span style="font-weight:bold; font-size:16px; color:white; display:block; margin-bottom:5px;">${d[0]}</span><span style="font-size:12px; color: #38bdf8; text-transform:uppercase; letter-spacing:1px;"><i class="fa fa-shop"></i> ${d[3] || 'Vendor'}</span><div class="qty-controls"><button onclick="updateQty('${d[0]}','decrease')">−</button><span style="font-size:18px; font-weight:bold;">${d[2]}</span><button onclick="updateQty('${d[0]}','increase')">+</button></div><button class="remove-btn" onclick="removeItem('${d[0]}')"><i class="fa fa-trash"></i> Remove</button></div>`; }); document.getElementById("cart-items").innerHTML = html; document.getElementById("cart-total").innerHTML = "Total Amount: <span style='color:#10b981; font-size:24px;'>₹" + total + "</span>"; document.getElementById("cart-count").innerText = data.length; }); }
+function addToCart(item, price, vendor_name) {
+    fetch("/add_to_cart", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+            item: item, 
+            price: price, 
+            vendor_name: vendor_name 
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === "added" || data.status === "ok") {
+            showToast(); // Show the "Added!" notification
+            loadCart();  // <-- THIS IS THE KEY: Refresh the drawer content instantly
+        }
+    })
+    .catch(err => console.log("Error adding to cart:", err));
+}    function loadCart() { fetch("/get_cart").then(res => res.json()).then(data => { let html = ""; let total = 0; data.forEach(d => { total += d[1] * d[2]; html += `<div class="cart-item"><span style="font-weight:bold; font-size:16px; color:white; display:block; margin-bottom:5px;">${d[0]}</span><span style="font-size:12px; color: #38bdf8; text-transform:uppercase; letter-spacing:1px;"><i class="fa fa-shop"></i> ${d[3] || 'Vendor'}</span><div class="qty-controls"><button onclick="updateQty('${d[0]}','decrease')">−</button><span style="font-size:18px; font-weight:bold;">${d[2]}</span><button onclick="updateQty('${d[0]}','increase')">+</button></div><button class="remove-btn" onclick="removeItem('${d[0]}')"><i class="fa fa-trash"></i> Remove</button></div>`; }); document.getElementById("cart-items").innerHTML = html; document.getElementById("cart-total").innerHTML = "Total Amount: <span style='color:#10b981; font-size:24px;'>₹" + total + "</span>"; document.getElementById("cart-count").innerText = data.length; }); }
     function updateQty(item, action) { fetch("/update_quantity", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ item, action }) }).then(loadCart); }
     function removeItem(item) { fetch("/remove_item", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ item }) }).then(loadCart); }
     function openCart() { document.getElementById("cartDrawer").classList.add("open"); }
@@ -608,7 +625,7 @@
             btn.addEventListener('click', () => setTimeout(triggerAnimations, 50)); 
         });
     });
-</script>
+
 // --- SMART REFRESH FOR STUDENT DASHBOARD ---
 // Sync Cart data every 1 second (without reloading page)
 setInterval(function() {
@@ -628,5 +645,6 @@ setInterval(function() {
         window.location.reload();
     }
 }, 5000);
+</script>
 </body>
 </html>

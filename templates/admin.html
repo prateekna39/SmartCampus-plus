@@ -757,7 +757,7 @@
         let dInput = document.getElementById('ev-date'); if(dInput) dInput.min = new Date().toISOString().split('T')[0];
         let lInput = document.getElementById('libDate'); if(lInput) lInput.min = new Date().toISOString().split('T')[0];
     });
-</script>
+
 // --- ADMIN LIVE DATA REFRESH ---
 setInterval(function() {
     const modalOpen = document.querySelector('.custom-modal[style*="display: flex"]');
@@ -767,5 +767,6 @@ setInterval(function() {
         window.location.reload();
     }
 }, 30000);
+</script>
 </body>
 </html>

@@ -75,4 +75,4 @@ function placeOrder() {
         document.getElementById("paymentModal").style.display = "none";
         closeCart(); loadCart();
     });
-}
+}   

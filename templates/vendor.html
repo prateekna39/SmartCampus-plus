@@ -308,7 +308,7 @@
         let dInput = document.getElementById('ev-date'); if(dInput) dInput.min = new Date().toISOString().split('T')[0];
         let lInput = document.getElementById('libDate'); if(lInput) lInput.min = new Date().toISOString().split('T')[0];
     });
-</script>
+
 // --- LIVE KITCHEN REFRESH ---
 // Refresh every 15 seconds so vendor sees new orders immediately
 setInterval(function() {
@@ -319,5 +319,6 @@ setInterval(function() {
         window.location.reload();
     }
 }, 10000);
+</script>
 </body>
 </html>
