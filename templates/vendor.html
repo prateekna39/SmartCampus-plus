@@ -207,108 +207,93 @@
 </div>
 
 <script>
-    // Keep your existing tab and modal functions intact
+    // 1. Audio Setup
+    const notificationSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3'); // Replace with your static/order_sound.mp3
+
+    // 2. Track Order Count to trigger sound
+    let lastOrderCount = {{ orders|length }};
+
+    function checkNewOrders() {
+        // This is triggered by your interval refresh
+        // If the current number of cards on screen is more than last check, play sound
+        const currentOrders = document.querySelectorAll('.food-card').length;
+        if (currentOrders > lastOrderCount) {
+            notificationSound.play().catch(e => console.log("Audio blocked by browser until first click."));
+            lastOrderCount = currentOrders;
+        }
+    }
+
+    // 3. The Real-Time Countdown Timer
+    function startTimers() {
+        document.querySelectorAll('.order-timer').forEach(timer => {
+            let timeStr = timer.getAttribute('data-time'); 
+            let orderId = timer.getAttribute('data-id');
+            
+            // Extract minutes from "15 mins" or "10 mins (Extended)"
+            let match = timeStr.match(/(\d+)/);
+            if (match) {
+                let totalMinutes = parseInt(match[1]);
+                
+                // We use localStorage so the timer doesn't reset when the page auto-refreshes
+                let uniqueKey = 'order_' + orderId + '_end';
+                let endTime = localStorage.getItem(uniqueKey);
+
+                if (!endTime) {
+                    endTime = new Date().getTime() + (totalMinutes * 60000);
+                    localStorage.setItem(uniqueKey, endTime);
+                }
+
+                let x = setInterval(function() {
+                    let now = new Date().getTime();
+                    let distance = endTime - now;
+
+                    if (distance < 0) {
+                        clearInterval(x);
+                        timer.innerHTML = "DELAYED";
+                        timer.style.color = "#ef4444";
+                    } else {
+                        let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                        let seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                        timer.innerHTML = minutes + "m " + seconds + "s";
+                    }
+                }, 1000);
+            }
+        });
+    }
+
+    // 4. Tab Switching
     function showTab(id, btn) {
         document.querySelectorAll(".tab-content").forEach(t => t.classList.remove("active"));
         document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
         document.getElementById(id).classList.add("active");
         btn.classList.add("active");
-
-        let cartBtn = document.querySelector('.floating-cart');
-        if (cartBtn) {
-            cartBtn.style.transform = id === 'food' ? "scale(1)" : "scale(0)";
-            cartBtn.style.opacity = id === 'food' ? "1" : "0";
-            cartBtn.style.pointerEvents = id === 'food' ? "all" : "none";
-        }
     }
 
-    function openEditStudentModal(id, username, password) {
-        document.getElementById('edit-student-username').value = username; 
-        document.getElementById('edit-student-password').value = password;
-        document.getElementById('editStudentForm').action = '/admin/edit_student/' + id; 
-        document.getElementById('editStudentModal').style.display = 'flex';
-    }
-    function closeEditStudentModal() { document.getElementById('editStudentModal').style.display = 'none'; }
-
-    function openEditEventModal(id, title, desc, date, time, loc, cat, org, link) {
-        document.getElementById('edit-ev-title').value = title; document.getElementById('edit-ev-desc').value = desc; document.getElementById('edit-ev-date').value = date;
-        document.getElementById('edit-ev-time').value = time; document.getElementById('edit-ev-loc').value = loc; document.getElementById('edit-ev-cat').value = cat;
-        document.getElementById('edit-ev-org').value = org; document.getElementById('edit-ev-link').value = link;
-        document.getElementById('editEventForm').action = '/admin/edit_event/' + id; document.getElementById('editEventModal').style.display = 'flex';
-    }
-    function closeEditEventModal() { document.getElementById('editEventModal').style.display = 'none'; }
-
-    // =========================================================
-    // GLITCH-FREE ANIMATION ENGINE
-    // =========================================================
+    // 5. Initialize & Auto-Refresh
     document.addEventListener("DOMContentLoaded", () => {
-        
-        // 1. Magnetic Glow (Untouched, works perfectly)
-        const applyMagneticEffect = () => {
-            document.querySelectorAll('.food-card, .event-card, .admin-section-box, table, .seat-blueprint').forEach(card => {
-                card.style.transition = 'background 0.3s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease';
-                card.addEventListener('mousemove', e => {
-                    const rect = card.getBoundingClientRect(); 
-                    const x = e.clientX - rect.left; 
-                    const y = e.clientY - rect.top;
-                    card.style.background = `radial-gradient(circle 500px at ${x}px ${y}px, rgba(56, 189, 248, 0.15), rgba(30, 41, 59, 0.4) 70%)`;
-                });
-                card.addEventListener('mouseleave', () => { card.style.background = `rgba(30, 41, 59, 0.4)`; });
-            });
-        };
-        applyMagneticEffect();
+        startTimers();
+        checkNewOrders();
 
-        // 2. The Fixed 3D Wave Reveal
-        window.triggerAnimations = function() {
-            const activeTab = document.querySelector('.tab-content.active') || document.body;
-            const elements = activeTab.querySelectorAll('.food-card, .event-card, .admin-section-box, table, .section-title, h2, h3, .seat-blueprint');
-            
-            // Instantly apply the CSS hidden state to all elements
-            elements.forEach(el => {
-                el.classList.remove('is-visible');
-                el.classList.add('reveal-up');
-                el.style.transitionDelay = '0ms'; // Reset any old delays
-            });
-            
-            const observer = new IntersectionObserver((entries) => {
-                let delay = 0;
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        // Apply the stagger delay
-                        entry.target.style.transitionDelay = `${delay}ms`;
-                        
-                        // Add the visible class (CSS handles the smooth animation natively)
-                        entry.target.classList.add('is-visible');
-                        
-                        delay += 80; // Speed of the cascade
-                        
-                        // Never observe this element again so it can't double-bounce
-                        observer.unobserve(entry.target);
-                    }
-                });
-                
-                // Reset the delay batch after a tiny pause so the next scroll starts instantly
-                setTimeout(() => { delay = 0; }, 100);
-                
-            }, { threshold: 0.05, rootMargin: "0px 0px -20px 0px" });
-            
-            elements.forEach(el => observer.observe(el));
-        };
-
-        // Fire on load and hook into tab clicks
-        setTimeout(triggerAnimations, 100);
-        document.querySelectorAll('.tab-btn').forEach(btn => { 
-            btn.addEventListener('click', () => setTimeout(triggerAnimations, 50)); 
-        });
-        
-        // Failsafe execution for other dynamically loaded scripts (like Calendars/Cart)
-        if(typeof loadCart === "function") loadCart();
-        if(typeof renderCalendar === "function") renderCalendar();
-        if(typeof startTimers === "function") startTimers();
-        let dInput = document.getElementById('ev-date'); if(dInput) dInput.min = new Date().toISOString().split('T')[0];
-        let lInput = document.getElementById('libDate'); if(lInput) lInput.min = new Date().toISOString().split('T')[0];
+        // Refresh kitchen every 15 seconds to look for new orders
+        setInterval(function() {
+            const isTyping = document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA';
+            if (!isTyping) {
+                // Before reloading, we save the order count
+                localStorage.setItem('prev_order_count', document.querySelectorAll('.food-card').length);
+                window.location.reload();
+            }
+        }, 15000);
     });
 
+    // Check if we should play sound after reload
+    if (localStorage.getItem('prev_order_count')) {
+        let prev = parseInt(localStorage.getItem('prev_order_count'));
+        let current = {{ orders|length }};
+        if (current > prev) {
+            notificationSound.play();
+        }
+        localStorage.removeItem('prev_order_count');
+    }
 // --- LIVE KITCHEN REFRESH ---
 // Refresh every 15 seconds so vendor sees new orders immediately
 setInterval(function() {
